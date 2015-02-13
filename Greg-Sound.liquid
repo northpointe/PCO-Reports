@@ -165,16 +165,12 @@ text-transform: uppercase;
                    <th class="time">{{ time.starts_at | date: '%I:%M%p' | downcase }}</th>
                 {% endfor %}
               {% endif %}
-
               {% if print_plan_item_length == true %}
                 <th class="length">Mins</th>
               {% endif %}
-
               <th class="theitem"></th>
-
-
             </tr>
-            </thead>
+          </thead>
         {% endif %}
         <tbody>
           {% for item in plan.items %}
@@ -245,49 +241,41 @@ text-transform: uppercase;
 
 
                     {% endif %}
-                    <pre class="description">
-                                        {{ item.description }}
-                                        {% for my_note in selected_item_notes %}
-                         {% for note in item.notes %}
-                        {% if note.category_name == my_note.name or note.category_name == my_note %}{{ note.note }}{% endif %}
-                      {% endfor %}
-                      {% endfor %}
-
-
-
-
-                                        </pre>
+<pre class="description">
+  {{ item.description }}
+  {% for my_note in selected_item_notes %}
+    {% for note in item.notes %}
+      {% if note.category_name == my_note.name or note.category_name == my_note %}
+        {{ note.note }}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+</pre>
 
                   </td>
-
-
-
 
                 {% endcase %}
             </tr>
           {% endfor %}
           </tbody>
-        {% if print_plan_item_times == true or print_plan_item_length == true %}
-          <tfoot>
-            <tr>
-              {% if print_plan_item_times == true %}
-                {% for time in plan.plan_times %}
-                  <th class="time">{{ time.ends_at | date: '%I:%M%p' | downcase }}</th>
-                {% endfor %}
-              {% endif %}
-
-              {% if print_plan_item_length == true %}
-                <th class="length">{{ plan.total_length }}</th>
-              {% endif %}
-
-              <th></th>
-
-            </tr>
-          </tfoot>
+  {% if print_plan_item_times == true or print_plan_item_length == true %}
+    <tfoot>
+      <tr>
+        {% if print_plan_item_times == true %}
+          {% for time in plan.plan_times %}
+            <th class="time">{{ time.ends_at | date: '%I:%M%p' | downcase }}</th>
+          {% endfor %}
         {% endif %}
-      </table>
-    {% endif %}
-    <!-- END PLAN TABLE -->
+        {% if print_plan_item_length == true %}
+          <th class="length">{{ plan.total_length }}</th>
+        {% endif %}
+        <th></th>
+      </tr>
+    </tfoot>
+  {% endif %}
+</table>
+{% endif %}
+<!-- END PLAN TABLE -->
 
   </body>
 </html>
