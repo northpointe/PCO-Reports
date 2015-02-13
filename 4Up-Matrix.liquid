@@ -1,5 +1,5 @@
 <!--
-   QUICK CUSTOMIZATION:
+  QUICK CUSTOMIZATION:
 
   SECTIONS TO PRINT
     {% assign print_series_titles = true %}
@@ -12,25 +12,19 @@
 
   PLAN NOTES TO PRINT
     {% array my_notes = "Band", "Vocals" %}
-
+  CATEGORY NAME OF PEOPLE TO PRINT
+    {% assign people_category = "Band" %}
   PEOPLE POSITIONS TO PRINT
     {% array my_positions = "Acoustic Guitar", "Electric Guitar", "Drums", "Bass Guitar", "Keys" %}
-CATEGORY NAME OF PEOPLE TO PRINT
-  {% assign people_category = "Band" %}
-
-  NUMBER OF COLUMNS
-    {% assign number_of_columns = "8" %}
-
 -->
 
 <html>
   <head>
     <title>Plans Report</title>
-      <script src="//use.typekit.net/jvj7mux.js"></script>
+    <script src="//use.typekit.net/jvj7mux.js"></script>
     <script>try{Typekit.load();}catch(e){}</script>
     <style>
       body { padding:0; margin:0; font-family: "proxima-nova", Gotham, Arial; font-size: 10pt; }
-      td { vertical-align: top; }
       td { vertical-align: center; }
       .matrix_container{width:50%;height:50%;float:left;overflow:hidden;}
       .matrix { border: none; border-collapse: collapse; height:50%; }
@@ -54,89 +48,77 @@ CATEGORY NAME OF PEOPLE TO PRINT
       .item_column { }
       .people_columns { width: 100px; }
         </style>
-    </head>
+  </head>
+<body>
+  {% for plan in plans limit:4 %}
+    <div class="matrix_container">
+    <table width="100%" class="matrix">
 
-    <body>
-
-
-
-    {% for plan in plans limit:4 %}
-      <div class="matrix_container">
-
-
-      <table width="100%" class="matrix">
-
-    <tr>
-      <td class="header_column" colspan="2">
-        {% if print_service_name == true %}<div class="ministry_name">{{ plan.ministry.name }}</div>{% endif %}
-        <div class="plan_dates">{{ plan.dates | date: "%A - %m/%d" }}</div>
-      </td>
+        <tr>
+          <td class="header_column" colspan="2">
+            {% if print_service_name == true %}<div class="ministry_name">{{ plan.ministry.name }}</div>{% endif %}
+            <div class="plan_dates">{{ plan.dates | date: "%A - %m/%d" }}</div>
+          </td>
+        </tr>
 
       <!-- PLAN ITEMS -->
       {% if print_items == true %}
-
-            <td class="item_column">
+        <tr>
+          <td class="item_column">
             {% for item in plan.items %}
               <div class="regular_title">{{ item.title }}</div>
             {% endfor %}
-            </td>
-
+          </td>
+        </tr>
       {% endif %}
       <!-- END PLAN ITEMS -->
 
       <!-- SONGS -->
       {% if print_songs == true %}
-
-
-              {% for item in plan.items %}
-            {% if item.item_type == 'Song' %}
-          <tr class="song_column">
-                  <td colspan="2">
+        {% for item in plan.items %}
+          {% if item.item_type == 'Song' %}
+            <tr class="song_column">
+              <td colspan="2">
               {{ item.title }}
-            {% if item.arrangement.music_key != "" %}
-                        <span class="key"> ({{ item.arrangement.music_key }})</span>
-                    {% for note in item.notes %}
-                          {% if note.category_name == "Person" %}
-                          - {{ note.note }}
-                          {% endif %}
-                        {% endfor %}
-
-                      {% endif %}
-            </td></tr>
-            {% endif %}
-          {% endfor %}
-
-
+                {% if item.arrangement.music_key != "" %}
+                  <span class="key"> ({{ item.arrangement.music_key }})</span>
+                  {% for note in item.notes %}
+                    {% if note.category_name == "Person" %}
+                      - {{ note.note }}
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </td>
+            </tr>
+          {% endif %}
+        {% endfor %}
       {% endif %}
       <!-- END SONGS -->
 
       <!-- PEOPLE -->
-      {% for category in people_categories %}
-              <tr><td colspan="2">&nbsp;</td></tr>
-                {% if category == people_category %}
+        {% for category in people_categories %}
+          <tr><td colspan="2">&nbsp;</td></tr>
+          {% if category == people_category %}
+            <tr>
+              <td class="section_header" colspan="2">Band</td>
+            </tr>
+            {% for plan_person in plan.plan_people_not_declined %}
+              {% if plan_person.category.name == category %}
+                {% if plan_person.person.name != null %}
                   <tr>
-                    <td class="section_header" colspan="2">Band</td>
+                    <td colspan="2" class="person_name">
+                      {{ plan_person.person.name }} - {{ plan_person.position }}
+                    </td>
                   </tr>
-
-                    {% for plan_person in plan.plan_people_not_declined %}
-                    {% if plan_person.category.name == category %}{% if plan_person.person.name != null %}
-                      <tr>
-                        <td colspan="2" class="person_name">{{ plan_person.person.name }} - {{ plan_person.position }}</td>
-                      </tr>
-                    {% endif %}{% endif %}
-                    {% endfor %}
-
-                 {% endif %}
-
-              {% endfor %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
       <!-- END PEOPLE -->
-</table>
-        </div>
-    {% endfor %}
+    </table>
+    </div>
+  {% endfor %}
 
-
-
-
-
-  </body>
+</body>
 </html>
