@@ -1,0 +1,153 @@
+<!--
+   QUICK CUSTOMIZATION:
+
+	SHOW ONLY OPEN SECTIONS (to print all sections, regardless of whether they are opened, set to false)
+		{% assign show_open_only = false %}
+
+	SECTIONS TO PRINT (to ignore open/closed status and predefine which sections to print, please set show_open_only above to false, and then set these sections accordingly)
+		{% assign print_titles = false %}
+		{% assign print_plan_notes = false %}
+		{% assign print_order_of_service = false %}
+		{% assign print_song_section = false %}
+		{% assign print_item_section = false %}
+		{% assign print_media_section = false %}
+		{% assign print_people = true %}
+
+	CATEGORIES TO PRINT
+		TO PRINT ONLY SELECTED CATEGORIES SET THESE TO false
+		{% assign all_people_categories = false %}
+		{% assign all_plan_notes_categories = false %}
+
+		AND SET INDIVIDUAL CATEGORY NAMES TO PRINT (make sure show_open_only is set correctly above)
+		{% array my_people_categories = "Band", "Vocals" %}
+		{% array my_plan_notes_categories = "General", "Band" %}
+
+	INTERNAL CODE
+		{% if show_open_only == true %}
+			{% assign print_plan_notes = plan_notes_opened %}
+			{% assign print_order_of_service = order_of_service_opened %}
+		{% endif %}
+
+-->
+
+<html>
+	<head>
+		<title>Plans Report</title>
+      	<script src="//use.typekit.net/jvj7mux.js"></script>
+    	<script>try{Typekit.load();}catch(e){}</script>
+		<style>
+			body { padding:0; margin:0; font-family: "proxima-nova", Gotham, Arial; font-size: 10pt; }
+			td { vertical-align: top; }
+			h1{font-size:24pt;text-align:center;margin-bottom:0;}
+			.matrix { border: solid 1px black; border-collapse: collapse; }
+			.matrix td { border: solid 1px black; padding: 2px;}
+			.ministry_name { font-weight: bold; font-size: 12pt; text-align: center; background-color: black; color: white; }
+			.plan_dates { font-weight: bold; font-size: 10pt; text-align: center; background-color:black; color: white;}
+			.series_title { font-weight: bold; font-size: 10pt; text-align: center; }
+			.plan_title { font-size: 10pt; text-align: center; }
+			.section_header { background-color: #666; color: white; font-weight: bold; font-size: 10pt; }
+			.item { border-bottom: dotted 1px #999; }
+			.header { font-weight: bold; border-bottom: solid 1px black; }
+			.song { font-style: italic; }
+			.media {  }
+			.row_header { background-color: #DDD; font-weight: bold; }
+
+			.unconfirmed { color: gray; }
+			.declined { color: gray; text-decoration: line-through; }
+        </style>
+    </head>
+
+    <body>
+      {% for masterplan in plans %}
+            {% capture currentmonth %}{{ masterplan.dates | date: "%m" }}{% endcapture %}
+
+            {% if currentmonth != month %}
+
+		<h1>
+          {{ masterplan.dates | date: "%B" }}
+      </h1>
+		<table width="100%" class="matrix">
+
+			<!-- PLAN DATES -->
+			<tr>
+				<td class="plan_dates"></td>
+				{% for plan in plans %}
+              		{% capture planmonth %}{{ plan.dates | date: "%m" }}{% endcapture %}
+              		{% if currentmonth == planmonth %}
+					<td class="plan_dates">{{ plan.dates }}</td>
+              		{% endif %}
+				{% endfor %}
+			</tr>
+			<!-- END PLAN DATES -->
+
+
+			<!-- SERIES AND PLAN TITLES -->
+			{% if print_titles == true %}
+				<tr>
+					<td class="row_header"></td>
+					{% for plan in plans %}
+						<td>
+							<div class="series_title">{{ plan.series_title }}</div>
+							<div class="plan_title">{{ plan.plan_title }}</div>
+						</td>
+					{% endfor %}
+				</tr>
+			{% endif %}
+			<!-- END SERIES AND PLAN TITLES -->
+
+
+
+
+			<!-- PEOPLE -->
+			{% if print_people == true %}
+
+				{% if all_people_categories == true %}
+					{% assign selected_people_categories = category_with_positions %}
+				{% else %}
+					{% assign selected_people_categories = my_people_categories %}
+				{% endif %}
+
+				{% for selected_category in selected_people_categories %}
+					{% for category in category_with_positions %}
+
+						{% if category.name == selected_category or category.name == selected_category.name %}
+
+							{% if show_open_only == true and category.opened == false  %}
+							{% else %}
+
+
+								{% for position in category.positions %}
+									<tr>
+										<td class="row_header">{{ position.name }}</td>
+										{% for plan in plans %}
+                                      	{% capture planmonth %}{{ plan.dates | date: "%m" }}{% endcapture %}
+              							{% if currentmonth == planmonth %}
+											<td class="people">
+												{% for plan_person in plan.plan_people_not_declined %}
+													{% if plan_person.position == position.name and plan_person.category.name == category.name %}
+														<div class="person_name {% if plan_person.status == "U"%}unconfirmed{% endif %}{% if plan_person.status == "D" %} declined{% endif %}">{{ plan_person.person.name }}{% if plan_person.status == "U" %} <img src="https://www.planningcenteronline.com/assets/icon_plan_person_u.gif" />{% endif %}</div>
+													{% endif %}
+												{% endfor %}
+											</td>
+                                      	{% endif %}
+										{% endfor %}
+									</tr>
+								{% endfor %}
+
+							{% endif %}
+
+						{% endif %}
+
+					{% endfor %}
+				{% endfor %}
+			{% endif %}
+			<!-- END PEOPLE -->
+
+
+		</table>
+
+      {% capture month %}{{ masterplan.dates | date: "%m" }}{% endcapture %}
+			{% endif %}
+      {% endfor %}
+	</body>
+</html>
