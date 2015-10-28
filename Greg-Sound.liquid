@@ -11,7 +11,7 @@ QUICK CUSTOMIZATION:
 
   PLAN ITEM OPTIONS
     {% assign print_plan_items = true %}
-    {% assign print_plan_item_times = false %}
+    {% assign print_plan_item_times = true %}
     {% assign print_plan_item_length = true %}
     {% assign print_song_key = false %}
     {% assign print_arrangement_name = false %}
@@ -169,6 +169,7 @@ text-transform: uppercase;
                 <th class="length">Mins</th>
               {% endif %}
               <th class="theitem"></th>
+              <th>Person</th>
             </tr>
           </thead>
         {% endif %}
@@ -220,38 +221,14 @@ text-transform: uppercase;
                         <span class="bpm">at {{ item.arrangement.bpm }} bpm</span>
                       {% endif %}
 
-
-                        <span class="sequence">
-                                              {% for note in item.notes %}
-                          {% if note.category_name == "Person" %}
-                            {% if item.song %}
-                              -
-                              {% else %}
-                              {% if item.title contains 'Message' %}
-                                Speaking:
-                              {% else %}
-                                Host:
-                              {% endif %}
-                            {% endif %}
-                          {{ note.note }}
-                          {% endif %}
-                        {% endfor %}
-
-                                          </span>
-
-
-                    {% endif %}
-<pre class="description">
-  {{ item.description }}
-  {% for my_note in selected_item_notes %}
-    {% for note in item.notes %}
-      {% if note.category_name == my_note.name or note.category_name == my_note %}
-        {{ note.note }}
-      {% endif %}
-    {% endfor %}
-  {% endfor %}
-</pre>
-
+                  {% endif %}
+                  </td>
+                  <td>
+                    {% for note in item.notes %}
+                      {% if note.category_name == "Person" %}
+                        {{ note.note }}
+                      {% endif %}
+                    {% endfor %}
                   </td>
 
                 {% endcase %}
@@ -270,6 +247,7 @@ text-transform: uppercase;
           <th class="length">{{ plan.total_length }}</th>
         {% endif %}
         <th></th>
+        <th>Person</th>
       </tr>
     </tfoot>
   {% endif %}
