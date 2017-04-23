@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Staffing CSV report with built in save to CSV functionality">
+    <meta name="author" content="Garrett Johnson">
+
+    <title>Planning Center Staffing Report</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <style>
+      body {
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #eee;
+      }
+
+      .form-download {
+        max-width: 720px;
+        padding: 15px;
+        margin: 0 auto;
+      }
+      .form-download .form-download-heading {
+        margin-bottom: 10px;
+      }
+      .form-download textarea {
+        margin-bottom: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div class="container">
+
+      <form class="form-download">
+        <h2 class="form-download-heading">Staffing Report CSV</h2>
+<textarea id="textarea" class="form-control" rows="10">
+Name,Date,Department,Position
+{% for person in people %}{% for future_plan in person.confirmed_future_plan_people -%}{% if current_plan_id != future_plan.plan.id -%}{% for future_plan_person in future_plan.plan.plan_people_not_declined -%}{% if future_plan_person.person.id == person.id -%}"{{ person.name }}","{{ future_plan.plan.dates }}","{{ future_plan.plan.ministry.name }}","{{ future_plan_person.position }}"
+{% endif -%}{% endfor -%}{% endif -%}{% assign current_plan_id = future_plan.plan.id -%}{% endfor -%}{% assign current_plan_dates = "" -%}{% assign current_plan_id = "" -%}{% endfor -%}
+</textarea>
+        <button id="btn-save" class="btn btn-lg btn-primary btn-block" type="submit">Download</button>
+      </form>
+
+    </div> <!-- /container -->
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js"></script>
+
+  <script>
+  $("#btn-save").click( function() {
+    var text = $("#textarea").val();
+    var filename = "pco-staffing"
+    var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, filename+".csv");
+  });
+  </script>
+
+  </body>
+</html>
